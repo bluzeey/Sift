@@ -3,6 +3,11 @@
   "name": "Sift",
   "version": "0.1.0",
   "description": "DOM-first, privacy-conscious feed-quality filtering with BYOK classification.",
+  "icons": {
+    "16": "logo.png",
+    "48": "logo.png",
+    "128": "logo.png"
+  },
   "permissions": ["storage", "tabs"],
   "host_permissions": [
     "https://x.com/*",
@@ -18,7 +23,12 @@
   },
   "action": {
     "default_title": "Sift",
-    "default_popup": "popup.html"
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "logo.png",
+      "48": "logo.png",
+      "128": "logo.png"
+    }
   },
   "options_page": "options.html",
   "content_scripts": [

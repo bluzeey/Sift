@@ -22,6 +22,12 @@ body {
   box-shadow: 0 20px 40px rgba(15, 23, 42, 0.35);
 }
 
+.popup-brand-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
 .popup-title-row {
   display: flex;
   justify-content: space-between;

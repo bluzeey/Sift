@@ -1,5 +1,7 @@
 # Sift
 
+<img src="public/logo.png" width="128" alt="Sift Logo" />
+
 Sift is a DOM-first, privacy-conscious browser extension that helps users sift signal from slop on supported feeds without a backend, accounts, analytics, or hidden scraping.
 
 ## What Sift Does

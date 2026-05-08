@@ -44,9 +44,12 @@ export function Popup(): JSX.Element {
     <main className="popup-shell">
       <section className="popup-card">
         <div className="popup-title-row">
-          <div>
-            <h1>Sift</h1>
-            <p>DOM-first feed filtering with BYOK.</p>
+          <div className="popup-brand-row">
+            <img src="/logo.png" alt="Sift Logo" width="32" height="32" />
+            <div>
+              <h1>Sift</h1>
+              <p>DOM-first feed filtering with BYOK.</p>
+            </div>
           </div>
           <span className={`badge ${state.enabled ? "badge-live" : "badge-paused"}`}>
             {state.enabled ? "Enabled" : "Disabled"}
