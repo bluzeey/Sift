@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="public/logo.png" width="128" alt="Sift Logo" />
+<img src="public/logo.png" width="128" alt="Sift Logo" style="border-radius: 12px;" />
 
 # Sift
 
