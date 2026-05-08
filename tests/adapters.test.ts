@@ -61,5 +61,19 @@ describe("site adapters", () => {
     expect(article?.kind).toBe("article");
     expect(article?.text.length).toBeGreaterThan(250);
     expect(article?.text.length).toBeLessThanOrEqual(3203);
+
+    window.history.replaceState({}, "", "/@jeremygrummet/note/c-255608835");
+    document.body.innerHTML = loadFixture("substack-note.html");
+
+    const notes = substackAdapter.findCandidates(document);
+    expect(notes).toHaveLength(1);
+
+    const note = substackAdapter.extractCandidate(notes[0]);
+    expect(note?.kind).toBe("note");
+    expect(note?.url).toContain("/note/");
+    expect(note?.text).toContain("Trust in the age of AI");
+    expect(note?.text).toContain("Humanity - Hubris or Humility?");
+    expect(note?.text).not.toContain("wisdomandaction.com.au");
+    expect(note?.text).not.toContain("Like");
   });
 });

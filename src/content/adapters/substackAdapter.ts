@@ -1,6 +1,28 @@
-import type { PostCandidate, SiteAdapter } from "../../shared/types";
+import type { PostCandidate, PostKind, SiteAdapter } from "../../shared/types";
 import { buildCandidateId, hideElement, restoreElement } from "./baseAdapter";
 import { cleanText, isGoodCandidateText, readNodeText } from "../dom/textExtractor";
+
+const noteSelector = "[role='article'][aria-label='Note']";
+
+function getUniqueElements(elements: HTMLElement[]): HTMLElement[] {
+  return Array.from(new Set(elements));
+}
+
+function isNoteElement(element: HTMLElement): boolean {
+  return element.matches(noteSelector);
+}
+
+function getSubstackKind(element: HTMLElement): PostKind {
+  if (isNoteElement(element) || location.pathname.includes("/note/")) {
+    return "note";
+  }
+
+  if (location.pathname.startsWith("/p/") || Boolean(element.querySelector("h1"))) {
+    return "article";
+  }
+
+  return "post";
+}
 
 export const substackAdapter: SiteAdapter = {
   site: "substack",
@@ -9,17 +31,18 @@ export const substackAdapter: SiteAdapter = {
   },
   findCandidates(root) {
     const previews = Array.from(root.querySelectorAll(".post-preview")) as HTMLElement[];
-    if (previews.length > 0) {
-      return previews;
-    }
+    const notes = (Array.from(root.querySelectorAll(noteSelector)) as HTMLElement[]).filter(
+      (element) => !element.parentElement?.closest(noteSelector)
+    );
 
     const articleLike = (Array.from(root.querySelectorAll("article, .post")) as HTMLElement[]).filter((element) => {
       const text = cleanText(readNodeText(element), { site: "substack", kind: "article" });
       return Boolean(element.querySelector("h1")) && text.length > 500;
     });
 
-    if (articleLike.length > 0) {
-      return Array.from(new Set(articleLike));
+    const directCandidates = getUniqueElements([...previews, ...notes, ...articleLike]);
+    if (directCandidates.length > 0) {
+      return directCandidates;
     }
 
     return (Array.from(root.querySelectorAll("main")) as HTMLElement[]).filter((element) => {
@@ -28,18 +51,25 @@ export const substackAdapter: SiteAdapter = {
     });
   },
   extractCandidate(element): PostCandidate | null {
+    const kind = getSubstackKind(element);
     const titleEl =
       (element.querySelector(".post-preview-title") as HTMLElement | null) ||
       (element.querySelector("h1") as HTMLElement | null);
     const descriptionEl = element.querySelector(".post-preview-description") as HTMLElement | null;
     const bodyEl = element.querySelector(".available-content, .markup, .body, .post") as HTMLElement | null;
+    const noteBodyEl = element.querySelector(".FeedProseMirror") as HTMLElement | null;
+    const sharedPreviewEl = element.querySelector("a.postAttachment-eYV3fM[href*='/p/']") as HTMLElement | null;
 
-    const kind = location.pathname.startsWith("/p/") ? "article" : "post";
     const title = cleanText(readNodeText(titleEl), { site: "substack", kind });
     const description = cleanText(readNodeText(descriptionEl), { site: "substack", kind });
     const body = cleanText(readNodeText(bodyEl), { site: "substack", kind });
+    const noteBody = cleanText(readNodeText(noteBodyEl), { site: "substack", kind });
+    const sharedPreview = cleanText(readNodeText(sharedPreviewEl), { site: "substack", kind });
 
-    let text = cleanText([title, description, body].filter(Boolean).join("\n\n"), { site: "substack", kind });
+    let text = cleanText([title, description, body, noteBody, sharedPreview].filter(Boolean).join("\n\n"), {
+      site: "substack",
+      kind
+    });
     if (!text) {
       text = cleanText(readNodeText(element), { site: "substack", kind });
     }
@@ -48,7 +78,9 @@ export const substackAdapter: SiteAdapter = {
       return null;
     }
 
-    const link = element.querySelector("a[href*='/p/']") as HTMLAnchorElement | null;
+    const noteLink = element.querySelector("a[href*='/note/']") as HTMLAnchorElement | null;
+    const postLink = element.querySelector("a[href*='/p/']") as HTMLAnchorElement | null;
+    const link = kind === "note" ? noteLink || postLink : postLink;
 
     return {
       id: buildCandidateId("substack", link?.href || `${location.href}:${text.slice(0, 180)}`),
