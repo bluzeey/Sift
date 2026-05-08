@@ -86,6 +86,70 @@ describe("linkedin adapter", () => {
     ]);
   });
 
+  it("finds modern LinkedIn feed cards without collapsing the main feed container", () => {
+    window.history.replaceState({}, "", "/feed/");
+    document.body.innerHTML = loadFixture("linkedin-modern-feed.html");
+
+    const cards = findLinkedInPosts(document);
+    expect(cards).toHaveLength(2);
+    expect(cards.every((card) => card.getAttribute("role") === "listitem")).toBe(true);
+    expect(cards.some((card) => card.getAttribute("data-testid") === "mainFeed")).toBe(false);
+  });
+
+  it("extracts modern LinkedIn author, body text, url, and relative timestamp", () => {
+    window.history.replaceState({}, "", "/feed/");
+    document.body.innerHTML = loadFixture("linkedin-modern-feed.html");
+
+    const card = findLinkedInPosts(document)[0];
+    const candidate = extractLinkedInPost(card);
+    expect(candidate?.author).toBe("Sahil Maheshwari");
+    expect(candidate?.timestamp).toBe("1d");
+    expect(candidate?.url).toContain("urn:li:activity:2001");
+    expect(candidate?.text).toContain("Anthropic just rolled out some significant updates for Claude users");
+    expect(candidate?.text).not.toContain("Feed post");
+  });
+
+  it("detects modern visible-text action controls and sponsored cards", () => {
+    window.history.replaceState({}, "", "/feed/");
+    document.body.innerHTML = loadFixture("linkedin-modern-feed.html");
+
+    const [postCard, sponsoredCard] = findLinkedInPosts(document);
+    const buttons = getLinkedInActionButtons(postCard);
+    expect(buttons.map((button) => button.textContent?.trim() || button.getAttribute("aria-label"))).toEqual([
+      "Like",
+      "Comment",
+      "Repost",
+      "Send"
+    ]);
+
+    const sponsored = extractLinkedInPost(sponsoredCard);
+    expect(sponsored?.kind).toBe("ad");
+  });
+
+  it("injects before the modern top-right control menu button", () => {
+    window.history.replaceState({}, "", "/feed/");
+    document.body.innerHTML = loadFixture("linkedin-modern-feed.html");
+
+    const card = findLinkedInPosts(document)[0];
+    const injectionTarget = getLinkedInInjectionTarget(card);
+    renderPill(injectionTarget, {
+      ok: true,
+      result: {
+        label: "useful",
+        confidence: 0.91,
+        reason: "Helpful update",
+        action: "label"
+      }
+    }, {
+      onHide: vi.fn()
+    });
+
+    const host = injectionTarget.element.querySelector("[data-sift-root-host='true']") as HTMLDivElement | null;
+    expect(injectionTarget.mode).toBe("inline");
+    expect(injectionTarget.before?.getAttribute("aria-label")).toContain("Open control menu for post by Sahil Maheshwari");
+    expect(host?.nextElementSibling).toBe(injectionTarget.before ?? null);
+  });
+
   it("injects the pill before the control menu instead of inside the action row", () => {
     document.body.innerHTML = loadFixture("linkedin-feed.html");
     const card = findLinkedInPosts(document)[0];
