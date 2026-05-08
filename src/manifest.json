@@ -10,7 +10,8 @@
     "https://www.reddit.com/*",
     "https://reddit.com/*",
     "https://*.substack.com/*",
-    "https://substack.com/*"
+    "https://substack.com/*",
+    "https://www.linkedin.com/*"
   ],
   "background": {
     "service_worker": "background/serviceWorker.js"
@@ -28,7 +29,8 @@
         "https://www.reddit.com/*",
         "https://reddit.com/*",
         "https://*.substack.com/*",
-        "https://substack.com/*"
+        "https://substack.com/*",
+        "https://www.linkedin.com/*"
       ],
       "js": ["content/index.js"],
       "run_at": "document_idle"

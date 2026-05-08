@@ -23,8 +23,8 @@ describe("privacy boundaries", () => {
     const message = buildClassifyPostsMessage("page-session", [
       {
         id: "x:1",
-        site: "x",
-        text: "A useful technical post",
+        site: "linkedin",
+        text: "A useful technical LinkedIn post about product metrics and engineering tradeoffs.",
         cacheKey: "cache-1",
         kind: "post"
       }
@@ -32,7 +32,7 @@ describe("privacy boundaries", () => {
 
     expect(JSON.stringify(message)).not.toContain("apiKey");
     expect(JSON.stringify(message)).not.toContain("baseUrl");
-    expect(message.items[0].text).toContain("technical post");
+    expect(message.items[0].text).toContain("LinkedIn post");
   });
 
   it("persists only preference fields and keeps sessionOnly in sync", () => {

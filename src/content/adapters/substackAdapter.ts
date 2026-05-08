@@ -92,7 +92,7 @@ export const substackAdapter: SiteAdapter = {
     };
   },
   getInjectionTarget(element) {
-    return element;
+    return { element, mode: "overlay" };
   },
   hideElement,
   restoreElement

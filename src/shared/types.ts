@@ -1,11 +1,17 @@
-export type SupportedSite = "x" | "reddit" | "substack";
+export type SupportedSite = "x" | "reddit" | "substack" | "linkedin";
 
 export type ClassificationLabel = "useful" | "maybe" | "slop";
 export type UiLabel = ClassificationLabel | "muted" | "error";
 
 export type ProviderKind = "openai-compatible" | "anthropic-compatible" | "local";
 
-export type PostKind = "post" | "comment" | "article" | "note" | "unknown";
+export type PostKind = "post" | "comment" | "article" | "note" | "ad" | "repost" | "job" | "unknown";
+
+export type InjectionTarget = {
+  element: HTMLElement;
+  mode?: "overlay" | "inline";
+  before?: HTMLElement | null;
+};
 
 export type PostCandidate = {
   id: string;
@@ -64,7 +70,7 @@ export type SiteAdapter = {
   matchesLocation(location: Location): boolean;
   findCandidates(root: ParentNode): HTMLElement[];
   extractCandidate(element: HTMLElement): PostCandidate | null;
-  getInjectionTarget(element: HTMLElement): HTMLElement;
+  getInjectionTarget(element: HTMLElement): InjectionTarget;
   hideElement(element: HTMLElement): void;
   restoreElement(element: HTMLElement): void;
 };

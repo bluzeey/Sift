@@ -14,7 +14,7 @@ describe("injected UI", () => {
 
     const onMarkUseful = vi.fn();
 
-    renderPill(target, {
+    renderPill({ element: target, mode: "overlay" }, {
       ok: true,
       result: {
         label: "slop",

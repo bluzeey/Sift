@@ -1,9 +1,9 @@
-import { CLASSIFIER_SYSTEM_PROMPT, REQUEST_TIMEOUT_MS } from "../../shared/constants";
+import { REQUEST_TIMEOUT_MS, getClassifierSystemPrompt } from "../../shared/constants";
 import type { ClassificationResult, ProviderConfig, SerializableCandidate, UserPreferences } from "../../shared/types";
 import { parseProviderJson, sanitizeClassificationResult } from "./openAICompatible";
 
 function buildUserPrompt(candidate: SerializableCandidate, preferences: UserPreferences): string {
-  return `User interests:\n${preferences.interests || "None provided."}\n\nUser dislikes:\n${preferences.dislikes || "None provided."}\n\nSite:\n${candidate.site}\n\nContent:\n${candidate.text}\n\nReturn strict JSON only with label, confidence, reason, and action.`;
+  return `User interests:\n${preferences.interests || "None provided."}\n\nUser dislikes:\n${preferences.dislikes || "None provided."}\n\nSite:\n${candidate.site}\n\nKind:\n${candidate.kind || "unknown"}\n\nContent:\n${candidate.text}\n\nReturn strict JSON only with label, confidence, reason, and action.`;
 }
 
 async function postJson(url: string, body: unknown, headers: Record<string, string>): Promise<unknown> {
@@ -46,9 +46,9 @@ export async function classifyWithAnthropicCompatible(
       model: config.model,
       max_tokens: 200,
       temperature: 0,
-      system: CLASSIFIER_SYSTEM_PROMPT,
-      messages: [{ role: "user", content: buildUserPrompt(candidate, preferences) }]
-    },
+        system: getClassifierSystemPrompt(candidate.site),
+        messages: [{ role: "user", content: buildUserPrompt(candidate, preferences) }]
+      },
     {
       "x-api-key": config.apiKey,
       "anthropic-version": "2023-06-01"

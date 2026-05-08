@@ -43,7 +43,7 @@ export const xAdapter: SiteAdapter = {
     };
   },
   getInjectionTarget(element) {
-    return element;
+    return { element, mode: "overlay" };
   },
   hideElement,
   restoreElement

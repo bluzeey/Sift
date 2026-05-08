@@ -1,3 +1,5 @@
+import type { InjectionTarget } from "../../shared/types";
+
 type HostEntry = {
   host: HTMLDivElement;
   adjustedPosition: boolean;
@@ -6,33 +8,51 @@ type HostEntry = {
 
 const hosts = new Map<HTMLElement, HostEntry>();
 
-export function ensureShadowRoot(target: HTMLElement): ShadowRoot {
-  const existing = hosts.get(target);
+export function ensureShadowRoot(target: InjectionTarget): ShadowRoot {
+  const existing = hosts.get(target.element);
   if (existing?.host.isConnected && existing.host.shadowRoot) {
     return existing.host.shadowRoot;
   }
 
-  const computedStyle = target.ownerDocument.defaultView?.getComputedStyle(target);
-  const previousPosition = target.style.position;
-  const adjustedPosition = computedStyle?.position === "static" || !computedStyle?.position;
+  const computedStyle = target.element.ownerDocument.defaultView?.getComputedStyle(target.element);
+  const previousPosition = target.element.style.position;
+  const isOverlay = target.mode !== "inline";
+  const adjustedPosition = isOverlay && (computedStyle?.position === "static" || !computedStyle?.position);
 
   if (adjustedPosition) {
-    target.style.position = "relative";
+    target.element.style.position = "relative";
   }
 
   const host = document.createElement("div");
   host.dataset.siftRootHost = "true";
   host.dataset.siftUi = "true";
-  host.style.position = "absolute";
-  host.style.top = "12px";
-  host.style.right = "12px";
   host.style.zIndex = "2147483646";
   host.style.pointerEvents = "auto";
   host.style.maxWidth = "min(340px, calc(100% - 24px))";
 
+  if (isOverlay) {
+    host.style.position = "absolute";
+    host.style.top = "12px";
+    host.style.right = "12px";
+  } else {
+    host.style.position = "relative";
+    host.style.display = "flex";
+    host.style.justifyContent = "flex-end";
+    host.style.flex = "0 0 auto";
+    host.style.marginLeft = "auto";
+  }
+
   const shadowRoot = host.attachShadow({ mode: "open" });
-  target.append(host);
-  hosts.set(target, {
+
+  if (target.mode === "inline" && target.before?.parentElement === target.element) {
+    target.element.insertBefore(host, target.before);
+  } else if (target.mode === "inline") {
+    target.element.prepend(host);
+  } else {
+    target.element.append(host);
+  }
+
+  hosts.set(target.element, {
     host,
     adjustedPosition,
     previousPosition

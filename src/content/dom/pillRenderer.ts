@@ -1,4 +1,4 @@
-import type { ClassificationOutcome, ClassificationResult, UiLabel } from "../../shared/types";
+import type { ClassificationOutcome, ClassificationResult, InjectionTarget, UiLabel } from "../../shared/types";
 import { ensureShadowRoot } from "./safeInject";
 
 export type PillHandlers = {
@@ -94,7 +94,7 @@ function createActionConfigs(state: PillState, handlers: PillHandlers): ActionBu
   return actions;
 }
 
-export function renderPill(target: HTMLElement, outcome: ClassificationOutcome | PillState, handlers: PillHandlers = {}): void {
+export function renderPill(target: InjectionTarget, outcome: ClassificationOutcome | PillState, handlers: PillHandlers = {}): void {
   const state: PillState = "ok" in outcome
     ? outcome.ok
       ? {
@@ -281,6 +281,6 @@ export function renderPill(target: HTMLElement, outcome: ClassificationOutcome |
   shadowRoot.append(style, wrapper);
 }
 
-export function renderManualPill(target: HTMLElement, result: ClassificationResult, handlers: PillHandlers = {}): void {
+export function renderManualPill(target: InjectionTarget, result: ClassificationResult, handlers: PillHandlers = {}): void {
   renderPill(target, { ok: true, result }, handlers);
 }

@@ -1,8 +1,8 @@
-import { CLASSIFIER_SYSTEM_PROMPT, REQUEST_TIMEOUT_MS } from "../../shared/constants";
+import { REQUEST_TIMEOUT_MS, getClassifierSystemPrompt } from "../../shared/constants";
 import type { ClassificationResult, ProviderConfig, SerializableCandidate, UserPreferences } from "../../shared/types";
 
 function buildUserPrompt(candidate: SerializableCandidate, preferences: UserPreferences): string {
-  return `User interests:\n${preferences.interests || "None provided."}\n\nUser dislikes:\n${preferences.dislikes || "None provided."}\n\nSite:\n${candidate.site}\n\nContent:\n${candidate.text}\n\nClassify this content for the user. Return strict JSON:\n{\n  "label": "useful" | "maybe" | "slop",\n  "confidence": number,\n  "reason": string,\n  "action": "show" | "label" | "hide"\n}\n\nRules:\n- confidence must be between 0 and 1\n- reason must be under 8 words\n- action should be "hide" only for clear slop\n- uncertain content should be "maybe"\n- thoughtful disagreement should not be punished\n- do not include markdown\n- do not include extra fields`;
+  return `User interests:\n${preferences.interests || "None provided."}\n\nUser dislikes:\n${preferences.dislikes || "None provided."}\n\nSite:\n${candidate.site}\n\nKind:\n${candidate.kind || "unknown"}\n\nContent:\n${candidate.text}\n\nClassify this content for the user. Return strict JSON:\n{\n  "label": "useful" | "maybe" | "slop",\n  "confidence": number,\n  "reason": string,\n  "action": "show" | "label" | "hide"\n}\n\nRules:\n- confidence must be between 0 and 1\n- reason must be under 8 words\n- action should be "hide" only for clear slop\n- uncertain content should be "maybe"\n- thoughtful disagreement should not be punished\n- do not include markdown\n- do not include extra fields`;
 }
 
 function parseJsonResponse(text: string): unknown {
@@ -101,7 +101,7 @@ export async function classifyWithOpenAICompatible(
       temperature: 0,
       response_format: { type: "json_object" },
       messages: [
-        { role: "system", content: CLASSIFIER_SYSTEM_PROMPT },
+        { role: "system", content: getClassifierSystemPrompt(candidate.site) },
         { role: "user", content: buildUserPrompt(candidate, preferences) }
       ]
     },

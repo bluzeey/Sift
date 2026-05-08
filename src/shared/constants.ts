@@ -1,4 +1,4 @@
-import type { ExtensionPreferences, ProviderKind } from "./types";
+import type { ExtensionPreferences, ProviderKind, SupportedSite } from "./types";
 
 export const PREFERENCES_STORAGE_KEY = "sift.preferences";
 
@@ -30,7 +30,16 @@ export const DEFAULT_PREFERENCES: ExtensionPreferences = {
 };
 
 export const CLASSIFIER_SYSTEM_PROMPT =
-  "You are Sift, a personal feed-quality classifier. Your job is to classify a social post, Reddit post, or newsletter/article preview according to the user's stated interests. Do not classify based only on agreement or disagreement. A post can challenge the user and still be useful. Prefer thoughtful, information-dense, novel, practical, educational, technical, or directly relevant content. Penalize low-effort memes, engagement bait, ragebait, spam, repetitive outrage, celebrity gossip, shallow takes, vague motivational filler, and content unrelated to the user's interests. Return strict JSON only.";
+  "You are Sift, a personal feed-quality classifier. Your job is to classify a social post, Reddit post, LinkedIn post, or newsletter/article preview according to the user's stated interests. Do not classify based only on agreement or disagreement. A post can challenge the user and still be useful. Prefer thoughtful, information-dense, novel, practical, educational, technical, or directly relevant content. Penalize low-effort memes, engagement bait, ragebait, spam, repetitive outrage, celebrity gossip, shallow takes, vague motivational filler, and content unrelated to the user's interests. Return strict JSON only.";
+
+export const LINKEDIN_CLASSIFIER_PROMPT_ADDITION =
+  "You are classifying LinkedIn feed posts. LinkedIn contains professional updates, reposts, hiring posts, company posts, creator posts, recommended posts, sponsored posts, and engagement bait. Prefer specific, useful, non-obvious, practical, technical, or thoughtful professional content. Penalize generic hustle content, fake vulnerability, vague motivational advice, engagement farming, comment-bait, repetitive AI-generated career advice, shallow corporate announcements, and irrelevant sponsored content. Do not punish thoughtful disagreement, credible self-promotion, or genuinely useful hiring/startup/product/technical content.";
+
+export function getClassifierSystemPrompt(site?: SupportedSite): string {
+  return site === "linkedin"
+    ? `${CLASSIFIER_SYSTEM_PROMPT} ${LINKEDIN_CLASSIFIER_PROMPT_ADDITION}`
+    : CLASSIFIER_SYSTEM_PROMPT;
+}
 
 export const REQUEST_TIMEOUT_MS = 20000;
 export const DOM_SCAN_DEBOUNCE_MS = 500;

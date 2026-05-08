@@ -47,7 +47,7 @@ export const redditAdapter: SiteAdapter = {
     };
   },
   getInjectionTarget(element) {
-    return element;
+    return { element, mode: "overlay" };
   },
   hideElement,
   restoreElement

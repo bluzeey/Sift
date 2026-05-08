@@ -17,6 +17,10 @@ export function getSupportedSiteFromUrl(urlString: string): SupportedSite | null
       return "substack";
     }
 
+    if (host === "linkedin.com" || host === "www.linkedin.com") {
+      return "linkedin";
+    }
+
     return null;
   } catch {
     return null;
