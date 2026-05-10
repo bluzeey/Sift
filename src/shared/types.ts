@@ -7,6 +7,19 @@ export type ProviderKind = "openai-compatible" | "anthropic-compatible" | "local
 
 export type PostKind = "post" | "comment" | "article" | "note" | "ad" | "repost" | "job" | "unknown";
 
+export type CandidateMediaType = "none" | "image" | "video";
+
+export type ClassificationMediaMode = "none" | "metadata-only" | "image-vision" | "video-metadata";
+
+export type CandidateImage = {
+  src: string;
+  alt?: string;
+  ariaLabel?: string;
+  caption?: string;
+  width?: number;
+  height?: number;
+};
+
 export type InjectionTarget = {
   element: HTMLElement;
   mode?: "overlay" | "inline";
@@ -23,6 +36,10 @@ export type PostCandidate = {
   community?: string;
   timestamp?: string;
   kind?: PostKind;
+  mediaType?: CandidateMediaType;
+  mediaSummary?: string;
+  images?: CandidateImage[];
+  isMediaOnly?: boolean;
 };
 
 export type SerializableCandidate = Omit<PostCandidate, "element">;
@@ -32,6 +49,8 @@ export type ClassificationResult = {
   confidence: number;
   reason: string;
   action: "show" | "label" | "hide";
+  mediaMode?: ClassificationMediaMode;
+  needsVision?: boolean;
 };
 
 export type ClassificationOutcome =

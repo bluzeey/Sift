@@ -17,6 +17,7 @@ Supported v1 sites:
 1. X / Twitter
 2. Reddit
 3. Substack
+4. LinkedIn
 
 ## What DOM-First Means
 
@@ -31,7 +32,7 @@ The extension uses:
 
 ## Why Screenshots Are Not Used
 
-Sift does not use screenshots, OCR, or continuous screen capture in v1. Screenshot pipelines are heavier, harder to audit, and broader than needed for this product. DOM-first extraction is simpler, more transparent, and better aligned with the extension's privacy model.
+Sift does not use screenshots, OCR, or continuous screen capture in v1. Screenshot pipelines are heavier, harder to audit, and broader than needed for this product. DOM-first extraction is simpler, more transparent, and better aligned with the extension's privacy model. For meaningful image posts, Sift may send a small downscaled thumbnail of the visible post image directly to your configured model provider.
 
 ## BYOK Model
 
@@ -53,12 +54,13 @@ When classification is enabled, Sift may send:
 1. Your interests and dislikes
 2. The supported site name
 3. Visible post or article text, capped before sending
+4. Qualifying visible image thumbnails for the current post
 
-This request goes directly from the extension to the provider endpoint you configured.
+Videos are not uploaded. Requests go directly from the extension to the provider endpoint you configured.
 
 Important privacy copy:
 
-> Sift does not run a backend and does not store your feed content. When classification is enabled, visible post text may be sent directly from your browser to the model provider you choose using your own API key. The model provider may process that request according to its own API terms.
+> Sift does not run a backend and does not store your feed content. When classification is enabled, visible post text and qualifying visible image thumbnails may be sent directly from your browser to the model provider you choose using your own API key. Videos are not uploaded. The model provider may process that request according to its own API terms.
 
 ## What Is Never Stored
 
@@ -76,7 +78,7 @@ Refresh the page and the current page-session classifications are gone.
 
 ## Privacy Statement
 
-> Sift has no backend. It does not collect analytics, does not store your feed, and does not sell data. It classifies only content visible in your browser tab. If you enable cloud model classification, selected visible text is sent directly from your browser extension to the model provider configured by you.
+> Sift has no backend. It does not collect analytics, does not store your feed, and does not sell data. It classifies only content visible in your browser tab. Selected visible text and qualifying visible image thumbnails may be sent directly from your browser extension to the model provider configured by you. Videos are not uploaded.
 
 ## Architecture
 
@@ -88,7 +90,7 @@ Main parts:
 2. Content scripts for DOM detection, pill rendering, and reversible hiding
 3. Popup UI for quick controls
 4. Options UI for provider setup and privacy settings
-5. Modular site adapters for X, Reddit, and Substack
+5. Modular site adapters for X, Reddit, Substack, and LinkedIn
 
 The content script never needs the API key. Classification requests flow like this:
 

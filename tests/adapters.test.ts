@@ -29,6 +29,25 @@ describe("site adapters", () => {
     expect(extracted?.text).not.toContain("Reply");
   });
 
+  it("extracts X image metadata and keeps video posts conservative", () => {
+    window.history.replaceState({}, "", "/x-media");
+    document.body.innerHTML = loadFixture("x-media-feed.html");
+
+    const candidates = xAdapter.findCandidates(document);
+    expect(candidates).toHaveLength(2);
+
+    const imagePost = xAdapter.extractCandidate(candidates[0]);
+    expect(imagePost?.mediaType).toBe("image");
+    expect(imagePost?.images).toHaveLength(1);
+    expect(imagePost?.images?.[0]?.alt).toContain("eval routing");
+    expect(imagePost?.mediaSummary).toContain("Architecture sketch from the thread");
+    expect(imagePost?.isMediaOnly).toBe(false);
+
+    const videoPost = xAdapter.extractCandidate(candidates[1]);
+    expect(videoPost?.mediaType).toBe("video");
+    expect(videoPost?.isMediaOnly).toBe(true);
+  });
+
   it("detects and extracts Reddit candidates", () => {
     window.history.replaceState({}, "", "/reddit-programming");
     document.body.innerHTML = loadFixture("reddit-feed.html");
@@ -75,5 +94,18 @@ describe("site adapters", () => {
     expect(note?.text).toContain("Humanity - Hubris or Humility?");
     expect(note?.text).not.toContain("wisdomandaction.com.au");
     expect(note?.text).not.toContain("Like");
+  });
+
+  it("extracts Substack preview image metadata", () => {
+    window.history.replaceState({}, "", "/archive-images");
+    document.body.innerHTML = loadFixture("substack-image-archive.html");
+
+    const previews = substackAdapter.findCandidates(document);
+    expect(previews).toHaveLength(1);
+
+    const preview = substackAdapter.extractCandidate(previews[0]);
+    expect(preview?.mediaType).toBe("image");
+    expect(preview?.images?.[0]?.alt).toContain("review times");
+    expect(preview?.text).toContain("review loops");
   });
 });

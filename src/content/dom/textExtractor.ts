@@ -119,3 +119,27 @@ export function isGoodCandidateText(text: string, element?: HTMLElement): boolea
   const uiWords = words.filter((word) => ACTION_LABELS.has(word.toLowerCase()));
   return uiWords.length / words.length < 0.35;
 }
+
+export function isGoodCandidatePayload(
+  input: { text: string; mediaSummary?: string; mediaType?: "none" | "image" | "video"; isMediaOnly?: boolean },
+  element?: HTMLElement
+): boolean {
+  if (element && (!isElementVisible(element) || isIgnoredContainer(element))) {
+    return false;
+  }
+
+  if (isGoodCandidateText(input.text, element)) {
+    return true;
+  }
+
+  if (!input.mediaType || input.mediaType === "none") {
+    return false;
+  }
+
+  if (input.mediaType === "video") {
+    return Boolean(input.text.trim()) || Boolean(input.isMediaOnly);
+  }
+
+  const mediaWords = (input.mediaSummary ?? "").split(/\s+/).filter(Boolean);
+  return mediaWords.length >= 3 || Boolean(input.isMediaOnly);
+}

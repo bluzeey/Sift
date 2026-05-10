@@ -1,6 +1,7 @@
 import type { PostCandidate, SiteAdapter } from "../../shared/types";
 import { buildCandidateId, hideElement, restoreElement } from "./baseAdapter";
-import { cleanText, isGoodCandidateText, readNodeText } from "../dom/textExtractor";
+import { extractPostMedia } from "../dom/mediaExtractor";
+import { cleanText, isGoodCandidatePayload, isGoodCandidateText, readNodeText } from "../dom/textExtractor";
 
 export const xAdapter: SiteAdapter = {
   site: "x",
@@ -22,8 +23,12 @@ export const xAdapter: SiteAdapter = {
     const tweetText = readNodeText(element.querySelector("[data-testid='tweetText']"));
     const fallbackText = cleanText(readNodeText(element), { site: "x", kind: "post" });
     const text = cleanText(tweetText || fallbackText, { site: "x", kind: "post" });
+    const media = extractPostMedia(element, {
+      ignoredSelector: "[data-testid='User-Name'], header, a[href*='/photo'] img[alt*='profile'], a[href*='/photo'] img[alt*='avatar']"
+    });
+    const isMediaOnly = !isGoodCandidateText(text, element) && media.mediaType !== "none";
 
-    if (!isGoodCandidateText(text, element)) {
+    if (!isGoodCandidatePayload({ text, mediaSummary: media.mediaSummary, mediaType: media.mediaType, isMediaOnly }, element)) {
       return null;
     }
 
@@ -39,7 +44,11 @@ export const xAdapter: SiteAdapter = {
       url: statusLink?.href,
       author: readNodeText(authorEl),
       timestamp: timestampEl?.getAttribute("datetime") ?? undefined,
-      kind: "post"
+      kind: "post",
+      mediaType: media.mediaType,
+      mediaSummary: media.mediaSummary || undefined,
+      images: media.images,
+      isMediaOnly
     };
   },
   getInjectionTarget(element) {

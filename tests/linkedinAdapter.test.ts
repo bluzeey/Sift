@@ -57,6 +57,21 @@ describe("linkedin adapter", () => {
     expect(candidate?.author).toBe("Marta Chen");
   });
 
+  it("extracts LinkedIn image metadata without treating profile photos as post media", () => {
+    window.history.replaceState({}, "", "/feed/");
+    document.body.innerHTML = loadFixture("linkedin-image-feed.html");
+
+    const card = findLinkedInPosts(document)[0];
+    const candidate = linkedinAdapter.extractCandidate(card);
+
+    expect(candidate?.mediaType).toBe("image");
+    expect(candidate?.images).toHaveLength(1);
+    expect(candidate?.images?.[0]?.alt).toContain("rollout metrics");
+    expect(candidate?.images?.[0]?.src).toContain("post-image.jpg");
+    expect(candidate?.images?.[0]?.src).not.toContain("avatar.jpg");
+    expect(candidate?.isMediaOnly).toBe(false);
+  });
+
   it("detects repost, sponsored, and job kinds", () => {
     document.body.innerHTML = loadFixture("linkedin-repost.html");
     const repost = linkedinAdapter.extractCandidate(findLinkedInPosts(document)[0]);

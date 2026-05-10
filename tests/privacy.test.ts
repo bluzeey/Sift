@@ -25,6 +25,9 @@ describe("privacy boundaries", () => {
         id: "x:1",
         site: "linkedin",
         text: "A useful technical LinkedIn post about product metrics and engineering tradeoffs.",
+        mediaType: "image",
+        mediaSummary: "Image 1 alt: rollout metrics slide",
+        images: [{ src: "https://media.licdn.com/post-image.jpg", alt: "rollout metrics slide" }],
         cacheKey: "cache-1",
         kind: "post"
       }
@@ -33,6 +36,7 @@ describe("privacy boundaries", () => {
     expect(JSON.stringify(message)).not.toContain("apiKey");
     expect(JSON.stringify(message)).not.toContain("baseUrl");
     expect(message.items[0].text).toContain("LinkedIn post");
+    expect(message.items[0].images?.[0]?.src).toContain("post-image.jpg");
   });
 
   it("persists only preference fields and keeps sessionOnly in sync", () => {

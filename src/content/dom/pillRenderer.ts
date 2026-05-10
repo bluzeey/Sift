@@ -24,7 +24,7 @@ function labelText(state: PillState): string {
     case "useful":
       return "Useful";
     case "maybe":
-      return "Maybe";
+      return state.reason ? `Maybe · ${state.reason}` : "Maybe";
     case "slop":
       return state.reason ? `Slop · ${state.reason}` : "Slop";
     case "muted":

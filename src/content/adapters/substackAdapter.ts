@@ -1,6 +1,7 @@
 import type { PostCandidate, PostKind, SiteAdapter } from "../../shared/types";
 import { buildCandidateId, hideElement, restoreElement } from "./baseAdapter";
-import { cleanText, isGoodCandidateText, readNodeText } from "../dom/textExtractor";
+import { extractPostMedia } from "../dom/mediaExtractor";
+import { cleanText, isGoodCandidatePayload, isGoodCandidateText, readNodeText } from "../dom/textExtractor";
 
 const noteSelector = "[role='article'][aria-label='Note']";
 
@@ -74,7 +75,12 @@ export const substackAdapter: SiteAdapter = {
       text = cleanText(readNodeText(element), { site: "substack", kind });
     }
 
-    if (!isGoodCandidateText(text, element)) {
+    const media = extractPostMedia(element, {
+      ignoredSelector: ".post-meta, .post-preview-byline, .post-preview-author, .avatar, header"
+    });
+    const isMediaOnly = !isGoodCandidateText(text, element) && media.mediaType !== "none";
+
+    if (!isGoodCandidatePayload({ text, mediaSummary: media.mediaSummary, mediaType: media.mediaType, isMediaOnly }, element)) {
       return null;
     }
 
@@ -88,7 +94,11 @@ export const substackAdapter: SiteAdapter = {
       element,
       text,
       url: link?.href || location.href,
-      kind
+      kind,
+      mediaType: media.mediaType,
+      mediaSummary: media.mediaSummary || undefined,
+      images: media.images,
+      isMediaOnly
     };
   },
   getInjectionTarget(element) {

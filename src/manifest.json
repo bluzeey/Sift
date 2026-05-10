@@ -12,11 +12,15 @@
   "host_permissions": [
     "https://x.com/*",
     "https://twitter.com/*",
+    "https://*.twimg.com/*",
     "https://www.reddit.com/*",
     "https://reddit.com/*",
     "https://*.substack.com/*",
     "https://substack.com/*",
-    "https://www.linkedin.com/*"
+    "https://substackcdn.com/*",
+    "https://*.substackcdn.com/*",
+    "https://www.linkedin.com/*",
+    "https://*.licdn.com/*"
   ],
   "background": {
     "service_worker": "background/serviceWorker.js"

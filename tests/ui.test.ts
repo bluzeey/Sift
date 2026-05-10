@@ -77,4 +77,24 @@ describe("injected UI", () => {
     expect(document.querySelector(".sift-hidden-placeholder")).toBeNull();
     expect(target.isConnected).toBe(true);
   });
+
+  it("shows maybe reasons in the pill text for media-only cases", () => {
+    const target = document.createElement("article");
+    target.textContent = "Visible post text";
+    document.body.appendChild(target);
+
+    renderPill({ element: target, mode: "overlay" }, {
+      ok: true,
+      result: {
+        label: "maybe",
+        confidence: 0.58,
+        reason: "media-only",
+        action: "label"
+      }
+    });
+
+    const host = target.querySelector("[data-sift-root-host='true']") as HTMLDivElement | null;
+    const shadowRoot = host?.shadowRoot;
+    expect(shadowRoot?.querySelector(".sift-pill")?.textContent).toContain("Maybe · media-only");
+  });
 });

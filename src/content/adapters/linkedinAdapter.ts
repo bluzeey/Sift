@@ -1,5 +1,6 @@
 import type { InjectionTarget, PostCandidate, PostKind, SiteAdapter } from "../../shared/types";
-import { cleanText, isElementVisible, isGoodCandidateText, isIgnoredContainer, readNodeText } from "../dom/textExtractor";
+import { extractPostMedia } from "../dom/mediaExtractor";
+import { cleanText, isElementVisible, isGoodCandidatePayload, isGoodCandidateText, isIgnoredContainer, readNodeText } from "../dom/textExtractor";
 import { buildCandidateId, hideElement, restoreElement } from "./baseAdapter";
 
 const primaryCardSelectors = [
@@ -401,6 +402,15 @@ export function extractLinkedInPost(card: HTMLElement): PostCandidate | null {
   const commentary = cleanLinkedInText(textFromFirst(card, textSelectors));
   const articleTitle = cleanLinkedInText(textFromFirst(card, articleTitleSelectors));
   const resharedText = cleanLinkedInText(textFromFirst(card, resharedTextSelectors));
+  const media = extractPostMedia(card, {
+    ignoredSelector: [
+      ".update-components-actor",
+      ".feed-shared-actor",
+      ".feed-shared-update-v2__control-menu-container",
+      "[aria-label*='Profile']",
+      "[aria-label*='profile']"
+    ].join(", ")
+  });
 
   let text = cleanLinkedInText(
     [author ? `Author: ${author}` : "", commentary, articleTitle, resharedText].filter(Boolean).join("\n\n")
@@ -412,7 +422,8 @@ export function extractLinkedInPost(card: HTMLElement): PostCandidate | null {
 
   const kind = inferLinkedInKind(card, text);
   const cappedText = capLinkedInText(text, kind);
-  if (!isGoodCandidateText(cappedText, card)) {
+  const isMediaOnly = !isGoodCandidateText(cappedText, card) && media.mediaType !== "none";
+  if (!isGoodCandidatePayload({ text: cappedText, mediaSummary: media.mediaSummary, mediaType: media.mediaType, isMediaOnly }, card)) {
     return null;
   }
 
@@ -426,7 +437,11 @@ export function extractLinkedInPost(card: HTMLElement): PostCandidate | null {
     url,
     author: author || undefined,
     timestamp: findTimestamp(card),
-    kind
+    kind,
+    mediaType: media.mediaType,
+    mediaSummary: media.mediaSummary || undefined,
+    images: media.images,
+    isMediaOnly
   };
 }
 

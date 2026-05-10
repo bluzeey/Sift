@@ -4,12 +4,35 @@ import { SessionCache } from "../src/content/classifier/sessionCache";
 
 describe("session dedupe", () => {
   it("normalizes repeated text into the same hash", async () => {
-    const first = await buildCandidateCacheKey("x", "Useful text about AI research", "prefs-1");
-    const second = await buildCandidateCacheKey("x", " useful   text about ai research ", "prefs-1");
-    const third = await buildCandidateCacheKey("x", "useful text about ai research", "prefs-2");
+    const first = await buildCandidateCacheKey({ site: "x", text: "Useful text about AI research", preferencesFingerprint: "prefs-1" });
+    const second = await buildCandidateCacheKey({
+      site: "x",
+      text: " useful   text about ai research ",
+      preferencesFingerprint: "prefs-1"
+    });
+    const third = await buildCandidateCacheKey({ site: "x", text: "useful text about ai research", preferencesFingerprint: "prefs-2" });
 
     expect(first).toBe(second);
     expect(third).not.toBe(first);
+  });
+
+  it("distinguishes posts with different media context", async () => {
+    const first = await buildCandidateCacheKey({
+      site: "x",
+      text: "Worth saving.",
+      preferencesFingerprint: "prefs-1",
+      mediaSummary: "Image 1 alt: routing chart",
+      imageSources: ["https://pbs.twimg.com/media/chart-a.jpg"]
+    });
+    const second = await buildCandidateCacheKey({
+      site: "x",
+      text: "Worth saving.",
+      preferencesFingerprint: "prefs-1",
+      mediaSummary: "Image 1 alt: meme screenshot",
+      imageSources: ["https://pbs.twimg.com/media/chart-b.jpg"]
+    });
+
+    expect(first).not.toBe(second);
   });
 
   it("stores and clears in-memory outcomes", () => {

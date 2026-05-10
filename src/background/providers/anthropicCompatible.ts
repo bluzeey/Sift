@@ -1,9 +1,26 @@
 import { REQUEST_TIMEOUT_MS, getClassifierSystemPrompt } from "../../shared/constants";
 import type { ClassificationResult, ProviderConfig, SerializableCandidate, UserPreferences } from "../../shared/types";
-import { parseProviderJson, sanitizeClassificationResult } from "./openAICompatible";
+import { prepareCandidateImages } from "./mediaPayload";
+import {
+  buildUserPrompt,
+  finalizeClassificationResult,
+  isImagePayloadRejected,
+  parseProviderJson,
+  sanitizeClassificationResult
+} from "./openAICompatible";
 
-function buildUserPrompt(candidate: SerializableCandidate, preferences: UserPreferences): string {
-  return `User interests:\n${preferences.interests || "None provided."}\n\nUser dislikes:\n${preferences.dislikes || "None provided."}\n\nSite:\n${candidate.site}\n\nKind:\n${candidate.kind || "unknown"}\n\nContent:\n${candidate.text}\n\nReturn strict JSON only with label, confidence, reason, and action.`;
+function buildAnthropicContent(prompt: string, images: Awaited<ReturnType<typeof prepareCandidateImages>>): Array<Record<string, unknown>> {
+  return [
+    { type: "text", text: prompt },
+    ...images.map((image) => ({
+      type: "image",
+      source: {
+        type: "base64",
+        media_type: image.mediaType,
+        data: image.base64
+      }
+    }))
+  ];
 }
 
 async function postJson(url: string, body: unknown, headers: Record<string, string>): Promise<unknown> {
@@ -40,27 +57,54 @@ export async function classifyWithAnthropicCompatible(
     throw new Error("API key is required for the selected provider");
   }
 
-  const response = (await postJson(
-    config.baseUrl,
-    {
-      model: config.model,
-      max_tokens: 200,
-      temperature: 0,
+  const preparedImages = await prepareCandidateImages(candidate);
+
+  const classifyOnce = async (images: Awaited<ReturnType<typeof prepareCandidateImages>>): Promise<ClassificationResult> => {
+    const response = (await postJson(
+      config.baseUrl,
+      {
+        model: config.model,
+        max_tokens: 200,
+        temperature: 0,
         system: getClassifierSystemPrompt(candidate.site),
-        messages: [{ role: "user", content: buildUserPrompt(candidate, preferences) }]
+        messages: [
+          {
+            role: "user",
+            content: buildAnthropicContent(buildUserPrompt(candidate, preferences, images.length > 0), images)
+          }
+        ]
       },
-    {
-      "x-api-key": config.apiKey,
-      "anthropic-version": "2023-06-01"
+      {
+        "x-api-key": config.apiKey,
+        "anthropic-version": "2023-06-01"
+      }
+    )) as {
+      content?: Array<{ type?: string; text?: string }>;
+    };
+
+    const text = response.content?.find((entry) => entry.type === "text")?.text;
+    if (!text) {
+      throw new Error("Provider returned an empty response");
     }
-  )) as {
-    content?: Array<{ type?: string; text?: string }>;
+
+    const rawResult = sanitizeClassificationResult(parseProviderJson(text));
+    const mediaMode = candidate.mediaType === "video"
+      ? "video-metadata"
+      : images.length > 0
+        ? "image-vision"
+        : candidate.mediaType === "image"
+          ? "metadata-only"
+          : "none";
+    return finalizeClassificationResult(candidate, rawResult, mediaMode);
   };
 
-  const text = response.content?.find((entry) => entry.type === "text")?.text;
-  if (!text) {
-    throw new Error("Provider returned an empty response");
-  }
+  try {
+    return await classifyOnce(preparedImages);
+  } catch (error) {
+    if (preparedImages.length > 0 && isImagePayloadRejected(error)) {
+      return classifyOnce([]);
+    }
 
-  return sanitizeClassificationResult(parseProviderJson(text));
+    throw error;
+  }
 }

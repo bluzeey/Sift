@@ -146,7 +146,13 @@ class SiftContentController {
       return;
     }
 
-    const cacheKey = await buildCandidateCacheKey(candidate.site, candidate.text, this.runtimeState.preferencesFingerprint);
+    const cacheKey = await buildCandidateCacheKey({
+      site: candidate.site,
+      text: candidate.text,
+      preferencesFingerprint: this.runtimeState.preferencesFingerprint,
+      mediaSummary: candidate.mediaSummary,
+      imageSources: candidate.images?.map((image) => image.src)
+    });
     const serializableCandidate: SerializableCandidate & { cacheKey: string } = {
       id: candidate.id,
       site: candidate.site,
@@ -156,6 +162,10 @@ class SiftContentController {
       community: candidate.community,
       timestamp: candidate.timestamp,
       kind: candidate.kind,
+      mediaType: candidate.mediaType,
+      mediaSummary: candidate.mediaSummary,
+      images: candidate.images,
+      isMediaOnly: candidate.isMediaOnly,
       cacheKey
     };
 
@@ -209,14 +219,38 @@ class SiftContentController {
       onShow: showElement
     });
 
-    if (
-      outcome.ok &&
-      this.runtimeState?.autoHide &&
-      outcome.result.label === "slop" &&
-      outcome.result.confidence >= this.runtimeState.threshold
-    ) {
+    if (this.shouldAutoHide(element, outcome)) {
       hideElement();
     }
+  }
+
+  private shouldAutoHide(element: HTMLElement, outcome: ClassificationOutcome): boolean {
+    if (!outcome.ok || !this.runtimeState?.autoHide) {
+      return false;
+    }
+
+    if (outcome.result.label !== "slop" || outcome.result.confidence < this.runtimeState.threshold) {
+      return false;
+    }
+
+    const candidate = this.candidateByElement.get(element);
+    if (!candidate) {
+      return true;
+    }
+
+    if (candidate.mediaType === "video") {
+      return false;
+    }
+
+    if (outcome.result.needsVision) {
+      return false;
+    }
+
+    if (candidate.mediaType === "image" && outcome.result.mediaMode !== "image-vision") {
+      return false;
+    }
+
+    return true;
   }
 
   private applyManualLabel(element: HTMLElement, label: ClassificationResult["label"]): void {
@@ -224,7 +258,9 @@ class SiftContentController {
       label,
       confidence: 1,
       reason: "Session override",
-      action: label === "slop" ? "hide" : "label"
+      action: label === "slop" ? "hide" : "label",
+      mediaMode: "none",
+      needsVision: false
     };
 
     showElement(element, this.adapter);
