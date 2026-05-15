@@ -42,6 +42,7 @@ async function classifySingle(
 ): Promise<ClassificationResult> {
   switch (providerConfig.provider) {
     case "openai-compatible":
+    case "fireworks":
       if (!providerConfig.apiKey) {
         throw new Error("API key is required for the selected provider");
       }

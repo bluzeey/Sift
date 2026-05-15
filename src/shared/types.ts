@@ -3,7 +3,7 @@ export type SupportedSite = "x" | "reddit" | "substack" | "linkedin";
 export type ClassificationLabel = "useful" | "maybe" | "slop";
 export type UiLabel = ClassificationLabel | "muted" | "error";
 
-export type ProviderKind = "openai-compatible" | "anthropic-compatible" | "local";
+export type ProviderKind = "openai-compatible" | "anthropic-compatible" | "local" | "fireworks";
 
 export type PostKind = "post" | "comment" | "article" | "note" | "ad" | "repost" | "job" | "unknown";
 

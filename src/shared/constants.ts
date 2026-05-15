@@ -5,7 +5,8 @@ export const PREFERENCES_STORAGE_KEY = "sift.preferences";
 export const DEFAULT_BASE_URLS: Record<ProviderKind, string> = {
   "openai-compatible": "https://api.openai.com/v1/chat/completions",
   "anthropic-compatible": "https://api.anthropic.com/v1/messages",
-  local: "http://127.0.0.1:11434/v1/chat/completions"
+  local: "http://127.0.0.1:11434/v1/chat/completions",
+  fireworks: "https://api.fireworks.ai/inference/v1/chat/completions"
 };
 
 export const DEFAULT_INTERESTS_PLACEHOLDER =
@@ -18,9 +19,9 @@ export const DEFAULT_PREFERENCES: ExtensionPreferences = {
   enabled: true,
   interests: "",
   dislikes: "",
-  provider: "openai-compatible",
-  model: "gpt-4o-mini",
-  baseUrl: DEFAULT_BASE_URLS["openai-compatible"],
+  provider: "fireworks",
+  model: "accounts/fireworks/routers/kimi-k2p6-turbo",
+  baseUrl: DEFAULT_BASE_URLS["fireworks"],
   apiKey: "",
   autoHide: false,
   threshold: 0.75,

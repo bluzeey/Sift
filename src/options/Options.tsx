@@ -64,6 +64,8 @@ function providerLabel(provider: ProviderKind): string {
       return "Anthropic-compatible";
     case "local":
       return "Local endpoint";
+    case "fireworks":
+      return "Fireworks AI";
     default:
       return "OpenAI-compatible";
   }
@@ -300,6 +302,7 @@ export function Options(): JSX.Element {
                     }
                   }}
                 >
+                  <option value="fireworks">Fireworks AI</option>
                   <option value="openai-compatible">OpenAI-compatible</option>
                   <option value="anthropic-compatible">Anthropic-compatible</option>
                   <option value="local">Local endpoint</option>
