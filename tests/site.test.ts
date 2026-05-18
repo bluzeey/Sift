@@ -6,4 +6,9 @@ describe("supported site detection", () => {
     expect(getSupportedSiteFromUrl("https://www.linkedin.com/feed/")).toBe("linkedin");
     expect(getSupportedSiteFromUrl("https://www.linkedin.com/search/results/content/")).toBe("linkedin");
   });
+
+  it("detects Peerlist as a supported site", () => {
+    expect(getSupportedSiteFromUrl("https://peerlist.io/scroll")).toBe("peerlist");
+    expect(getSupportedSiteFromUrl("https://www.peerlist.io/scroll/trending")).toBe("peerlist");
+  });
 });

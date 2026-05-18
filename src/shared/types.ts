@@ -1,4 +1,4 @@
-export type SupportedSite = "x" | "reddit" | "substack" | "linkedin";
+export type SupportedSite = "x" | "reddit" | "substack" | "linkedin" | "peerlist";
 
 export type ClassificationLabel = "useful" | "maybe" | "slop";
 export type UiLabel = ClassificationLabel | "muted" | "error";

@@ -21,6 +21,10 @@ export function getSupportedSiteFromUrl(urlString: string): SupportedSite | null
       return "linkedin";
     }
 
+    if (host === "peerlist.io" || host === "www.peerlist.io") {
+      return "peerlist";
+    }
+
     return null;
   } catch {
     return null;
