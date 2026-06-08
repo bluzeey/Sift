@@ -6,7 +6,8 @@ export const DEFAULT_BASE_URLS: Record<ProviderKind, string> = {
   "openai-compatible": "https://api.openai.com/v1/chat/completions",
   "anthropic-compatible": "https://api.anthropic.com/v1/messages",
   local: "http://127.0.0.1:11434/v1/chat/completions",
-  fireworks: "https://api.fireworks.ai/inference/v1/chat/completions"
+  fireworks: "https://api.fireworks.ai/inference/v1/chat/completions",
+  umans: "https://api.code.umans.ai/v1/chat/completions"
 };
 
 export const DEFAULT_INTERESTS_PLACEHOLDER =

@@ -58,7 +58,7 @@ function saveStatusText(saveState: SaveState, dirty: boolean, errorMessage: stri
   return dirty ? "You have unsaved changes." : "Everything is up to date.";
 }
 
-function providerLabel(provider: ProviderKind): string {
+  function providerLabel(provider: ProviderKind): string {
   switch (provider) {
     case "anthropic-compatible":
       return "Anthropic-compatible";
@@ -66,6 +66,8 @@ function providerLabel(provider: ProviderKind): string {
       return "Local endpoint";
     case "fireworks":
       return "Fireworks AI";
+    case "umans":
+      return "Umans AI";
     default:
       return "OpenAI-compatible";
   }
@@ -305,6 +307,7 @@ export function Options(): JSX.Element {
                   <option value="fireworks">Fireworks AI</option>
                   <option value="openai-compatible">OpenAI-compatible</option>
                   <option value="anthropic-compatible">Anthropic-compatible</option>
+                  <option value="umans">Umans AI</option>
                   <option value="local">Local endpoint</option>
                 </select>
               </label>
