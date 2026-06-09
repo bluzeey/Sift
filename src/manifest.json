@@ -22,7 +22,8 @@
     "https://www.linkedin.com/*",
     "https://*.licdn.com/*",
     "https://peerlist.io/*",
-    "https://www.peerlist.io/*"
+    "https://www.peerlist.io/*",
+    "https://api.code.umans.ai/*"
   ],
   "background": {
     "service_worker": "background/serviceWorker.js"

@@ -1,6 +1,10 @@
-import type { ExtensionPreferences, ProviderKind, SupportedSite } from "./types";
+import type { ExtensionPreferences, ProviderKind, ScheduleConfig, SupportedSite } from "./types";
 
 export const PREFERENCES_STORAGE_KEY = "sift.preferences";
+export const AUTOMATION_RUNS_STORAGE_KEY = "sift.automationRuns";
+export const SCHEDULE_STORAGE_KEY = "sift.schedule";
+export const AUTOMATION_LOCK_KEY = "sift.automationLock";
+export const AUTOMATION_REPLY_LIMITS: AutomationReplyLimit[] = [10, 20, 100];
 
 export const DEFAULT_BASE_URLS: Record<ProviderKind, string> = {
   "openai-compatible": "https://api.openai.com/v1/chat/completions",
