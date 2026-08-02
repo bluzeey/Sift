@@ -1,17 +1,18 @@
-import type { ExtensionPreferences, ProviderKind, ScheduleConfig, SupportedSite } from "./types";
+import type { ExtensionPreferences, ProviderKind, SupportedSite } from "./types";
 
 export const PREFERENCES_STORAGE_KEY = "sift.preferences";
-export const AUTOMATION_RUNS_STORAGE_KEY = "sift.automationRuns";
-export const SCHEDULE_STORAGE_KEY = "sift.schedule";
-export const AUTOMATION_LOCK_KEY = "sift.automationLock";
-export const AUTOMATION_REPLY_LIMITS: AutomationReplyLimit[] = [10, 20, 100];
 
 export const DEFAULT_BASE_URLS: Record<ProviderKind, string> = {
   "openai-compatible": "https://api.openai.com/v1/chat/completions",
   "anthropic-compatible": "https://api.anthropic.com/v1/messages",
   local: "http://127.0.0.1:11434/v1/chat/completions",
   fireworks: "https://api.fireworks.ai/inference/v1/chat/completions",
-  umans: "https://api.code.umans.ai/v1/chat/completions"
+  umans: "https://api.code.umans.ai/v1/chat/completions",
+  "opencode-go": "https://opencode.ai/zen/go/v1/chat/completions"
+};
+
+export const DEFAULT_PROVIDER_MODELS: Partial<Record<ProviderKind, string>> = {
+  "opencode-go": "deepseek-v4-pro"
 };
 
 export const DEFAULT_INTERESTS_PLACEHOLDER =

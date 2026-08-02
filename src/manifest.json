@@ -23,7 +23,8 @@
     "https://*.licdn.com/*",
     "https://peerlist.io/*",
     "https://www.peerlist.io/*",
-    "https://api.code.umans.ai/*"
+    "https://api.code.umans.ai/*",
+    "https://opencode.ai/zen/go/v1/*"
   ],
   "background": {
     "service_worker": "background/serviceWorker.js"

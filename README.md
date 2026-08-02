@@ -47,6 +47,17 @@ Your API key:
 
 If you explicitly enable `Store my preferences on this device`, provider settings and preferences can be stored locally on your machine. Sift still does not persist post text, browsing history, or classification logs.
 
+### OpenCode Go
+
+Sift supports OpenCode Go models that use the OpenAI-compatible Chat Completions API.
+
+1. Subscribe and create an API key at [OpenCode](https://opencode.ai/auth).
+2. Select `OpenCode Go` in Sift settings.
+3. Sift selects `deepseek-v4-pro` and the official `https://opencode.ai/zen/go/v1/chat/completions` endpoint.
+4. Save the settings before using `Test connection`.
+
+Enter bare API model IDs such as `deepseek-v4-pro`, not OpenCode configuration IDs such as `opencode-go/deepseek-v4-pro`. Models that require OpenCode Go's `/messages` or `/responses` endpoints are not supported by this integration. See the [OpenCode Go documentation](https://opencode.ai/docs/go/) for current models, limits, and retention terms.
+
 ## What Gets Sent To The Model Provider
 
 When classification is enabled, Sift may send:

@@ -2,7 +2,8 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import {
   DEFAULT_BASE_URLS,
   DEFAULT_DISLIKES_PLACEHOLDER,
-  DEFAULT_INTERESTS_PLACEHOLDER
+  DEFAULT_INTERESTS_PLACEHOLDER,
+  DEFAULT_PROVIDER_MODELS
 } from "../shared/constants";
 import { buildClearSessionDataMessage, buildTestProviderMessage } from "../shared/messaging";
 import { PRIVACY_COPY } from "../shared/privacy";
@@ -68,6 +69,8 @@ function saveStatusText(saveState: SaveState, dirty: boolean, errorMessage: stri
       return "Fireworks AI";
     case "umans":
       return "Umans AI";
+    case "opencode-go":
+      return "OpenCode Go";
     default:
       return "OpenAI-compatible";
   }
@@ -294,7 +297,8 @@ export function Options(): JSX.Element {
                         ? {
                             ...current,
                             provider,
-                            baseUrl: DEFAULT_BASE_URLS[provider]
+                            baseUrl: DEFAULT_BASE_URLS[provider],
+                            model: DEFAULT_PROVIDER_MODELS[provider] ?? current.model
                           }
                         : current
                     );
@@ -308,6 +312,7 @@ export function Options(): JSX.Element {
                   <option value="openai-compatible">OpenAI-compatible</option>
                   <option value="anthropic-compatible">Anthropic-compatible</option>
                   <option value="umans">Umans AI</option>
+                  <option value="opencode-go">OpenCode Go</option>
                   <option value="local">Local endpoint</option>
                 </select>
               </label>
@@ -342,6 +347,9 @@ export function Options(): JSX.Element {
                   </button>
                 </div>
                 <span className="field-hint">Current mode: {providerLabel(preferences.provider)}</span>
+                {preferences.provider === "opencode-go" ? (
+                  <span className="field-hint">Uses your OpenCode Go API key and a bare chat-model ID such as deepseek-v4-pro.</span>
+                ) : null}
               </label>
             </div>
 

@@ -44,6 +44,7 @@ async function classifySingle(
     case "openai-compatible":
     case "fireworks":
     case "umans":
+    case "opencode-go":
       if (!providerConfig.apiKey) {
         throw new Error("API key is required for the selected provider");
       }
