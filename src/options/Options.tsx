@@ -71,6 +71,8 @@ function saveStatusText(saveState: SaveState, dirty: boolean, errorMessage: stri
       return "Umans AI";
     case "opencode-go":
       return "OpenCode Go";
+    case "openrouter":
+      return "OpenRouter";
     default:
       return "OpenAI-compatible";
   }
@@ -312,6 +314,7 @@ export function Options(): JSX.Element {
                   <option value="openai-compatible">OpenAI-compatible</option>
                   <option value="anthropic-compatible">Anthropic-compatible</option>
                   <option value="umans">Umans AI</option>
+                  <option value="openrouter">OpenRouter</option>
                   <option value="opencode-go">OpenCode Go</option>
                   <option value="local">Local endpoint</option>
                 </select>
@@ -347,6 +350,9 @@ export function Options(): JSX.Element {
                   </button>
                 </div>
                 <span className="field-hint">Current mode: {providerLabel(preferences.provider)}</span>
+                {preferences.provider === "openrouter" ? (
+                  <span className="field-hint">Uses your OpenRouter API key. Cheapest paid JSON-capable default: mistralai/mistral-nemo.</span>
+                ) : null}
                 {preferences.provider === "opencode-go" ? (
                   <span className="field-hint">Uses your OpenCode Go API key and a bare chat-model ID such as deepseek-v4-pro.</span>
                 ) : null}

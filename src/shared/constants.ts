@@ -8,11 +8,13 @@ export const DEFAULT_BASE_URLS: Record<ProviderKind, string> = {
   local: "http://127.0.0.1:11434/v1/chat/completions",
   fireworks: "https://api.fireworks.ai/inference/v1/chat/completions",
   umans: "https://api.code.umans.ai/v1/chat/completions",
-  "opencode-go": "https://opencode.ai/zen/go/v1/chat/completions"
+  "opencode-go": "https://opencode.ai/zen/go/v1/chat/completions",
+  openrouter: "https://openrouter.ai/api/v1/chat/completions"
 };
 
 export const DEFAULT_PROVIDER_MODELS: Partial<Record<ProviderKind, string>> = {
-  "opencode-go": "deepseek-v4-pro"
+  "opencode-go": "deepseek-v4-pro",
+  openrouter: "mistralai/mistral-nemo"
 };
 
 export const DEFAULT_INTERESTS_PLACEHOLDER =
@@ -25,9 +27,9 @@ export const DEFAULT_PREFERENCES: ExtensionPreferences = {
   enabled: true,
   interests: "",
   dislikes: "",
-  provider: "fireworks",
-  model: "accounts/fireworks/routers/kimi-k2p6-turbo",
-  baseUrl: DEFAULT_BASE_URLS["fireworks"],
+  provider: "openrouter",
+  model: DEFAULT_PROVIDER_MODELS.openrouter as string,
+  baseUrl: DEFAULT_BASE_URLS.openrouter,
   apiKey: "",
   autoHide: false,
   threshold: 0.75,

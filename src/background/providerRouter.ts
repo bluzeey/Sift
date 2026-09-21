@@ -45,6 +45,7 @@ async function classifySingle(
     case "fireworks":
     case "umans":
     case "opencode-go":
+    case "openrouter":
       if (!providerConfig.apiKey) {
         throw new Error("API key is required for the selected provider");
       }

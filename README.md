@@ -47,6 +47,17 @@ Your API key:
 
 If you explicitly enable `Store my preferences on this device`, provider settings and preferences can be stored locally on your machine. Sift still does not persist post text, browsing history, or classification logs.
 
+### OpenRouter
+
+Sift supports OpenRouter through its OpenAI-compatible Chat Completions API.
+
+1. Create an API key at [OpenRouter](https://openrouter.ai/settings/keys).
+2. Select `OpenRouter` in Sift settings.
+3. Sift selects `mistralai/mistral-nemo` and the official `https://openrouter.ai/api/v1/chat/completions` endpoint by default.
+4. Save the settings before using `Test connection`.
+
+The default was chosen as the cheapest paid OpenRouter model found in the model API that supports `response_format` for strict JSON output: `mistralai/mistral-nemo` at about `$0.019 / 1M` input tokens and `$0.030 / 1M` output tokens at research time. Sift also asks OpenRouter to sort upstream providers by `price` and require requested parameters. For image-vision support, switch the model to a cheap multimodal option such as `google/gemma-3-4b-it`; otherwise image posts fall back to text and metadata.
+
 ### OpenCode Go
 
 Sift supports OpenCode Go models that use the OpenAI-compatible Chat Completions API.

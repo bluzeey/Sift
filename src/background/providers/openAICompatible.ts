@@ -175,6 +175,20 @@ export function finalizeClassificationResult(
   };
 }
 
+function applyProviderRequestPreferences(config: ProviderConfig, body: Record<string, unknown>): Record<string, unknown> {
+  if (config.provider !== "openrouter") {
+    return body;
+  }
+
+  return {
+    ...body,
+    provider: {
+      sort: "price",
+      require_parameters: true
+    }
+  };
+}
+
 async function postJson(url: string, body: unknown, headers: Record<string, string>): Promise<unknown> {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
@@ -210,7 +224,7 @@ export async function classifyWithOpenAICompatible(
   const classifyOnce = async (images: PreparedImage[]): Promise<ClassificationResult> => {
     const response = (await postJson(
       config.baseUrl,
-      {
+      applyProviderRequestPreferences(config, {
         model: config.model,
         temperature: 0,
         response_format: { type: "json_object" },
@@ -221,7 +235,7 @@ export async function classifyWithOpenAICompatible(
             content: buildUserContent(buildUserPrompt(candidate, preferences, images.length > 0), images)
           }
         ]
-      },
+      }),
       config.apiKey
         ? {
             Authorization: `Bearer ${config.apiKey}`
